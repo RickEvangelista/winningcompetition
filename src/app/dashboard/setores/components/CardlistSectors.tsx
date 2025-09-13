@@ -41,7 +41,7 @@ export default function CardlistSectors({ sectors }: CardlistSectorsProps) {
             {filteredItems.map((i) => (
               <div
                 key={i.id_setor}
-                className="flex flex-col border-t-4 border-custom-blue rounded-md shadow-md hover:shadow-lg transition-shadow gap-4 p-5"
+                className="flex flex-col border-t-4 border-custom-blue rounded-lg shadow-md hover:shadow-lg transition-shadow gap-4 p-5"
               >
                 <h3 className="text-3xl font-sembold">{i.titulo_setor}</h3>
                 <p className="text-2xl">{i.capacidade}</p>

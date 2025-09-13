@@ -23,7 +23,7 @@ export default function CreateSectorForm({events}:CreateSectorFormProps) {
     ))
 
   return (
-    <form action={dispatch} className="w-full md:w-100 flex flex-col p-5 gap-5 border-4 border-custom-blue rounded-md">
+    <form action={dispatch} className="w-full md:w-100 flex flex-col p-5 gap-5 border-4 border-custom-blue rounded-lg">
         <h1 className="text-4xl font-semibold text-center text-custom-blue">Cadastrar setor</h1>
         <Input label={'Titulo setor: '} name={'titulo_setor'} placeholder={'Digite o titulo do setor'} />
         <Input label={'Capacidade:'} name={'capacidade'} type='number' placeholder={'Digite a capacidade do setor'} />
