@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 import { FormState } from "@/types/formState";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
-import { userSchema, NewUserData } from "../schemas/userSchema";
+import { userSchema } from "../schemas/userSchema";
 
 export default async function updateUser(
   prevState: FormState,
@@ -21,71 +21,63 @@ export default async function updateUser(
   const validateData = userSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
+
   if (!validateData.success)
     return {
       success: false,
       message: validateData.error.issues[0]?.message ?? "Dados inválidos",
     };
 
-  const { nome_completo, email, cpf, senha, perfil } =
-    validateData.data as NewUserData;
+  const { nome_completo, email, cpf, senha, perfil } = validateData.data;
 
   try {
-    const result = await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx) => {
       const profile = await tx.perfil.findUnique({
         where: { titulo_perfil: perfil },
       });
 
-      if (!profile)
-        return {
-          success: false,
-          message: "Perfil não encontrado",
-        };
+      if (!profile) throw new Error("Usuário não encontrado");
 
       let user = await tx.usuario.findUnique({
         where: { id_usuario },
       });
 
-      if (!user)
-        return {
-          success: false,
-          message: "Usuário não encontrado no sistema",
-        };
+      if (!user) throw new Error("Perfil não encontrado");
 
-      const updatedPerson = await tx.pessoa.update({
-        where: {id_pessoa: user.pessoa_id_pessoa},
-          data: {
-            nome_completo,
-            email,
-            cpf,
-          },
-        });
-      
+      await tx.pessoa.update({
+        where: { id_pessoa: user.pessoa_id_pessoa },
+        data: {
+          nome_completo,
+          email,
+          cpf,
+        },
+      });
 
       const hash = await bcrypt.hash(senha, 12);
 
-      const updatedUser = await tx.usuario.update({
-        where: {id_usuario},
+      await tx.usuario.update({
+        where: { id_usuario },
         data: {
           senha: hash,
           perfil_id_perfil: profile.id_perfil,
         },
       });
-
-      revalidatePath("/dashboard/usuarios");
-      return {
-        success: true,
-        message: "Usuário atualizado com sucesso",
-      };
-
     });
-
-    return result;
-  } catch (error) {
+    revalidatePath("/dashboard/usuarios");
+    return {
+      success: true,
+      message: "Usuário atualizado com sucesso",
+    };
+  } catch (error: any) {
     console.log(error);
+    if (error.code === "P2002")
+      return {
+        success: false,
+        message: "Esse cpf já pertence a outro usuário",
+      };
+    return {
+      success: false,
+      message: "Esse cpf já pertence a outro usuário",
+    };
   }
-  return {
-    success: false,
-    message: "Erro ao atualizar usuário",
-  };
 }

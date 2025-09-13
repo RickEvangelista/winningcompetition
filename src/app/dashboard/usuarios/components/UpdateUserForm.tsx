@@ -5,13 +5,18 @@ import Input from "@/components/Input";
 import InputMasked from "@/components/InputMasked";
 import { FormState } from "@/types/formState";
 import React, { useActionState, useEffect } from "react";
-import createUser from "../actions/createUser";
 import Button from "@/components/Button";
+import { user } from "@/types/user";
+import updateUser from "../actions/updateUser";
 import useFeedback from "@/hooks/useFeedback";
 
-export default function CreateUserForm() {
+interface UpdateUserFormProps {
+  user: user;
+}
+
+export default function UpdateUserForm({ user }: UpdateUserFormProps) {
   const initialState: FormState = { success: false, message: "" };
-  const [state, dispatch] = useActionState(createUser, initialState);
+  const [state, dispatch] = useActionState(updateUser, initialState);
   const { showMessage } = useFeedback();
 
   useEffect(() => {
@@ -29,28 +34,42 @@ export default function CreateUserForm() {
       className="w-full md:w-100 flex flex-col p-5 gap-5 border-4 border-custom-blue rounded-lg"
     >
       <h1 className="text-4xl font-semibold text-center text-custom-blue">
-        Cadastrar usuário
+        Atualizar usuário
       </h1>
+      <input type="hidden" name="id_usuario" value={user.id_usuario} />
       <Input
         label={"Nome: "}
         name={"nome_completo"}
         placeholder={"Digite o nome completo"}
+        defaultValue={user.pessoa.nome_completo}
       />
-      <Input label={"Email:"} name={"email"} placeholder={"Digite o email"} />
-      <InputMasked label={"CPF:"} name={"cpf"} placeholder={"Digite o cpf"} />
+      <Input
+        label={"Email:"}
+        name={"email"}
+        placeholder={"Digite o email"}
+        defaultValue={user.pessoa.email}
+      />
+      <InputMasked
+        label={"CPF:"}
+        name={"cpf"}
+        placeholder={"Digite o cpf"}
+        defaultValue={user.pessoa.cpf}
+      />
       <Input
         label={"Senha:"}
         type={"password"}
         name={"senha"}
         placeholder={"Digite a senha por favor"}
+        defaultValue={user.senha}
       />
       <Dropdown
         label={"Perfil:"}
         name={"perfil"}
         placeholder={"Selecione um perfil"}
         options={profiles}
+        defaultValue={user.perfil.titulo_perfil}
       />
-      <Button>Cadastrar</Button>
+      <Button>Atualizar</Button>
     </form>
   );
 }

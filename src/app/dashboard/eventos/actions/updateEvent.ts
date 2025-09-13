@@ -3,7 +3,7 @@
 import prisma from "@/lib/prisma";
 import { FormState } from "@/types/formState";
 import { revalidatePath } from "next/cache";
-import { eventSchema, NewEventSchema } from "../schemas/eventSchema";
+import { eventSchema } from "../schemas/eventSchema";
 
 export default async function updateEvent(
   prevState: FormState,
@@ -26,23 +26,17 @@ export default async function updateEvent(
       message: validateData.error.issues[0]?.message ?? "Dados inválidos",
     };
 
-  const { titulo_evento, capacidade, dt_fim, dt_inicio } =
-    validateData.data as NewEventSchema;
+  const { titulo_evento, capacidade, dt_fim, dt_inicio } = validateData.data;
 
   try {
-    const result = await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx) => {
       const event = await tx.evento.findUnique({
         where: { id_evento },
       });
 
-      if (!event)
-        return {
-          success: false,
-          message: "Evento não encontrado",
-        };
+      if (!event) throw new Error("Evento não encontrado");
 
-
-      const updatedEvent = await tx.evento.update({
+      await tx.evento.update({
         where: { id_evento },
         data: {
           titulo_evento,
@@ -51,19 +45,17 @@ export default async function updateEvent(
           capacidade,
         },
       });
-
-      revalidatePath("/dashboard/eventos");
-      return {
-        success: true,
-        message: "Evento atualizado com sucesso",
-      };
     });
-    return result;
-  } catch (error) {
+    revalidatePath("/dashboard/eventos");
+    return {
+      success: true,
+      message: "Evento atualizado com sucesso",
+    };
+  } catch (error: any) {
     console.log(error);
+    return {
+      success: false,
+      message: error.message ?? "Erro ao atualizar Evento",
+    };
   }
-  return {
-    success: false,
-    message: "Erro ao atualizar Evento",
-  };
 }

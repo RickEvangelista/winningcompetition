@@ -24,7 +24,7 @@ export default function Input({
         name={name}
         id={name}
         defaultValue={defaultValue}
-        className="p-2 border-2 border-black w-full rounded-md"
+        className="p-2 border-2 border-black w-full rounded-lg"
         {...props}
       >
         <option value="">{placeholder}</option>

@@ -2,7 +2,7 @@
 
 import React from "react";
 import prisma from "@/lib/prisma";
-import UpdateEventForm from "../../components/UpdateFormUser";
+import UpdateSectorForm from "../../components/UpdateFormSector";
 
 export default async function page({
   params,
@@ -11,17 +11,34 @@ export default async function page({
 }) {
   const { id } = await params;
 
-  const id_evento = Number(id)
+  const id_setor = Number(id);
 
-  const event = await prisma.evento.findUnique({
-    where: { id_evento },
+  const sector = await prisma.setor.findUnique({
+    where: { id_setor },
+    include: { evento: true },
   });
 
-  if(!event) return {succes:false, message: "Evento não encontrado"}
+  const events = await prisma.evento.findMany({
+    orderBy: { id_evento: "desc" },
+  });
+
+  if (!events)
+    return (
+      <div className="flex flex-col min-h-screen w-full justify-center items-center">
+        <p className="text-3xl text-center">Nenhum evento encontrado</p>
+      </div>
+    );
+
+  if (!sector)
+    return (
+      <div className="flex flex-col min-h-screen w-full justify-center items-center">
+        <p className="text-3xl text-center">Nenhum Setor encontrado</p>
+      </div>
+    );
 
   return (
     <div className="flex flex-col min-h-screen w-full justify-center items-center">
-      <UpdateEventForm event={event} />
+      <UpdateSectorForm sector={sector} events={events} />
     </div>
   );
 }

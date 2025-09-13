@@ -4,11 +4,12 @@ import React from "react";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import Button from "@/components/Button";
-import CardListEvents from "./components/CardListEvents";
+import CardlistSectors from "./components/CardlistSectors";
 
 export default async function page() {
   const sectors = await prisma.setor.findMany({
-    orderBy: {id_setor: "desc"}
+    orderBy: { id_setor: "desc" },
+    include: { evento: true },
   });
   return (
     <div className="flex flex-col min-h-screen w-full gap-5">
@@ -18,7 +19,7 @@ export default async function page() {
           <Button type="button">Novo setor</Button>
         </Link>
       </div>
-      <CardlistSector sectors={sectors} />
+      <CardlistSectors sectors={sectors} />
     </div>
   );
 }

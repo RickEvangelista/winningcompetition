@@ -4,28 +4,27 @@ import Button from "@/components/Button";
 import Input from "@/components/Input";
 import Link from "next/link";
 import React, { useState } from "react";
-import { event } from "@/types/event";
-import deleteEvent from "../actions/deleteEvent";
-import toast from "react-hot-toast";
+import { sector } from "@/types/sectors";
+import deleteSector from "../actions/deleteSector";
 import useFeedback from "@/hooks/useFeedback";
 
-interface CardListEventsProps {
-  events: event[];
+interface CardlistSectorsProps {
+  sectors: sector[];
 }
 
-export default function CardListEvents({ events }: CardListEventsProps) {
+export default function CardlistSectors({ sectors }: CardlistSectorsProps) {
   const [search, setSearch] = useState("");
-  const { showMessage } = useFeedback();
- 
-  const handleDelete = async (id: number) => {
-      const result = await deleteEvent(id);
-      showMessage(result);
-    };
-    
-    const filteredItems = events.filter((i) =>
-      i.titulo_evento.toLowerCase().includes(search.toLocaleLowerCase())
-    );
+    const { showMessage } = useFeedback();
   
+
+  const handleDelete = async(id: number) => {
+    const result = await deleteSector(id)
+    showMessage(result)
+  }
+
+  const filteredItems = sectors.filter((i) =>
+    i.titulo_setor.toLowerCase().includes(search.toLocaleLowerCase())
+  );
   return (
     <div className="flex flex-col gap-5">
       <Input
@@ -34,30 +33,23 @@ export default function CardListEvents({ events }: CardListEventsProps) {
         placeholder={"Filtre usuários por nome ou perfil"}
         onChange={(e) => setSearch(e.target.value)}
       />
-
       <div className="flex flex-col">
         {filteredItems.length === 0 ? (
-          <h2 className="text-3xl font-semibold">Nenhum evento encontrado</h2>
+          <h2 className="text-3xl font-semibold">Nenhum setor encontrado</h2>
         ) : (
           <div className="grid grid-cols-1 md:grid cols-2 lg:grid-cols-3 gap-5">
             {filteredItems.map((i) => (
               <div
-                key={i.id_evento}
+                key={i.id_setor}
                 className="flex flex-col border-t-4 border-custom-blue rounded-md shadow-md hover:shadow-lg transition-shadow gap-4 p-5"
               >
-                <h3 className="text-3xl font-sembold">{i.titulo_evento}</h3>
-                <p className="text-2xl">{`${i.dt_inicio.toLocaleDateString(
-                  "pt-BR",
-                  { timeZone: "UTC" }
-                )} até ${i.dt_fim.toLocaleDateString("pt-BR", {
-                  timeZone: "UTC",
-                })}`}</p>
+                <h3 className="text-3xl font-sembold">{i.titulo_setor}</h3>
                 <p className="text-2xl">{i.capacidade}</p>
-                <p className="text-2xl">{i.id_evento}</p>
+                <p className="text-2xl">{i.evento.titulo_evento}</p>
                 <div className="flex justify-between items-center">
                   <Link
                     className="text-custom-blue text-2xl hover:underline w-1/2"
-                    href={`/dashboard/eventos/${i.id_evento}/editar`}
+                    href={`/dashboard/setores/${i.id_setor}/editar`}
                   >
                     Ver/Editar
                   </Link>
@@ -65,7 +57,7 @@ export default function CardListEvents({ events }: CardListEventsProps) {
                     variant={"danger"}
                     type="button"
                     className="w-1/2"
-                    onClick={() => handleDelete(i.id_evento)}
+                    onClick={() => deleteSector(i.id_setor)}
                   >
                     Deletar
                   </Button>

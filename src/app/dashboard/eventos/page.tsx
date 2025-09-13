@@ -8,7 +8,7 @@ import CardListEvents from "./components/CardListEvents";
 
 export default async function page() {
   const events = await prisma.evento.findMany({
-    orderBy: {id_evento: "desc"}
+    orderBy: { id_evento: "desc" },
   });
   return (
     <div className="flex flex-col min-h-screen w-full gap-5">

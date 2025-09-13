@@ -57,7 +57,7 @@ model pessoa {
 
 model setor {
   id_setor         Int        @id @default(autoincrement())
-  titulo_setor     String     @unique(map: "setorcol1_UNIQUE") @db.VarChar(25)
+  titulo_setor     String     @db.VarChar(25)
   capacidade       Int
   evento_id_evento Int
   ingresso         ingresso[]

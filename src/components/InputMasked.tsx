@@ -21,7 +21,7 @@ export default function Input({
       <IMaskInput
         mask={"000.000.000-00"}
         name={name}
-        className="p-2 border-2 border-black w-full rounded-md"
+        className="p-2 border-2 border-black w-full rounded-lg"
         unmask={true}
         defaultValue={defaultValue}
         placeholder={placeholder}

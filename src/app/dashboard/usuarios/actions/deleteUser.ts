@@ -5,7 +5,7 @@ import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
 export default async function deleteUser(id: number) {
-  const id_usuario = Number(id);
+  const id_usuario = id;
 
   if (!id_usuario || isNaN(id_usuario))
     return {
@@ -14,7 +14,7 @@ export default async function deleteUser(id: number) {
     };
 
   try {
-    const result = await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx) => {
       const user = await tx.usuario.findUnique({
         where: { id_usuario },
       });
@@ -22,29 +22,24 @@ export default async function deleteUser(id: number) {
       if (!user)
         return {
           success: false,
-          message: "Perfil não encontrado",
+          message: "Usuário não encontrado",
         };
 
-      const deletedUser = await tx.usuario.delete({
-        where:{ id_usuario},
+      await tx.usuario.delete({
+        where: { id_usuario },
       });
-
-      revalidatePath("/dashboard/usuarios");
-
-      return {
-        success: true,
-        message: "Usuário deletado com sucesso",
-      };
     });
+
+    revalidatePath("/dashboard/usuarios");
     return {
       success: true,
-      message: "Usuário cadastrado com sucesso",
+      message: "Usuário deletado com sucesso",
     };
-  } catch (error) {
+  } catch (error: any) {
     console.log(error);
+    return {
+      success: false,
+      message: error.message ?? "Erro ao deletar usuário",
+    };
   }
-  return {
-    success: false,
-    message: "Erro ao deletar usuário",
-  };
 }

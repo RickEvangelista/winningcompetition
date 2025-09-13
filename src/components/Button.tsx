@@ -17,7 +17,7 @@ export default function Input({
   return (
 <button className={
     clsx(
-        "p-2 text-white text-2xl font-semibold rounded-md",
+        "p-2 text-white text-2xl font-semibold rounded-lg",
         {
             "bg-custom-blue" : variant === "primary",
             "bg-custom-pink" : variant === "danger",

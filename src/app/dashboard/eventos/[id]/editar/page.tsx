@@ -11,13 +11,13 @@ export default async function page({
 }) {
   const { id } = await params;
 
-  const id_evento = Number(id)
+  const id_evento = Number(id);
 
   const event = await prisma.evento.findUnique({
     where: { id_evento },
   });
 
-  if(!event) return {succes:false, message: "Evento não encontrado"}
+  if (!event) return { success: false, message: "Evento não encontrado" };
 
   return (
     <div className="flex flex-col min-h-screen w-full justify-center items-center">

@@ -9,6 +9,7 @@ import Button from "@/components/Button";
 export default async function page() {
   const users = await prisma.usuario.findMany({
     include: { pessoa: true, perfil: true },
+    orderBy: { id_usuario: "desc" },
   });
   return (
     <div className="flex flex-col min-h-screen w-full gap-5">

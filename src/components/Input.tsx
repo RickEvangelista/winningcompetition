@@ -11,7 +11,7 @@ export default function Input({label, name, placeholder,type="text", defaultValu
     <div className='flex flex-col'>
         <label htmlFor={name} className="text-2xl">{label}</label>
 
-        <input className='p-2 border-2 border-black w-full rounded-md' type={type} name={name} placeholder={placeholder} defaultValue={defaultValue} required {...props} />
+        <input className='p-2 border-2 border-black w-full rounded-lg' type={type} name={name} placeholder={placeholder} defaultValue={defaultValue} required {...props} />
     </div>
   )
 }
