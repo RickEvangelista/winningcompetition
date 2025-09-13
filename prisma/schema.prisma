@@ -1,0 +1,92 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model evento {
+  id_evento          Int      @id @default(autoincrement())
+  titulo_evento      String   @unique(map: "titulo_evento_UNIQUE") @db.VarChar(25)
+  capacidade         Int
+  dt_inicio          DateTime @db.Date
+  dt_fim             DateTime @db.Date
+  criador_id_usuario Int?
+  usuario            usuario? @relation(fields: [criador_id_usuario], references: [id_usuario], map: "fk_evento_usuario1")
+  setor              setor[]
+
+  @@index([criador_id_usuario], map: "fk_evento_usuario1_idx")
+}
+
+model ingresso {
+  id_ingresso                                    Int               @id @default(autoincrement())
+  codigo                                         String            @db.Char(6)
+  situacao                                       ingresso_situacao @default(Emitido)
+  dt_validacao                                   DateTime?         @db.DateTime(0)
+  setor_id_setor                                 Int
+  pessoa_id_pessoa                               Int
+  criador_id_usuario                             Int?
+  validador_id_usuario                           Int?
+  pessoa                                         pessoa            @relation(fields: [pessoa_id_pessoa], references: [id_pessoa], map: "fk_ingresso_pessoa1")
+  setor                                          setor             @relation(fields: [setor_id_setor], references: [id_setor], map: "fk_ingresso_setor1")
+  usuario_ingresso_criador_id_usuarioTousuario   usuario?          @relation("ingresso_criador_id_usuarioTousuario", fields: [criador_id_usuario], references: [id_usuario], map: "fk_ingresso_usuario1")
+  usuario_ingresso_validador_id_usuarioTousuario usuario?          @relation("ingresso_validador_id_usuarioTousuario", fields: [validador_id_usuario], references: [id_usuario], map: "fk_ingresso_usuario2")
+
+  @@index([pessoa_id_pessoa], map: "fk_ingresso_pessoa1_idx")
+  @@index([setor_id_setor], map: "fk_ingresso_setor1_idx")
+  @@index([criador_id_usuario], map: "fk_ingresso_usuario1_idx")
+  @@index([validador_id_usuario], map: "fk_ingresso_usuario2_idx")
+}
+
+model perfil {
+  id_perfil     Int       @id @default(autoincrement())
+  titulo_perfil String    @unique(map: "titulo_perfil_UNIQUE") @db.VarChar(20)
+  usuario       usuario[]
+}
+
+model pessoa {
+  id_pessoa     Int        @id @default(autoincrement())
+  nome_completo String     @db.VarChar(100)
+  email         String     @unique(map: "email_UNIQUE") @db.VarChar(45)
+  cpf           String     @unique(map: "cpf_UNIQUE") @db.Char(11)
+  ingresso      ingresso[]
+  usuario       usuario?
+}
+
+model setor {
+  id_setor         Int        @id @default(autoincrement())
+  titulo_setor     String     @db.VarChar(25)
+  capacidade       Int
+  evento_id_evento Int
+  ingresso         ingresso[]
+  evento           evento     @relation(fields: [evento_id_evento], references: [id_evento], map: "fk_setor_evento1")
+
+  @@index([evento_id_evento], map: "fk_setor_evento1_idx")
+}
+
+model usuario {
+  id_usuario                                      Int        @id @default(autoincrement())
+  senha                                           String     @db.VarChar(64)
+  pessoa_id_pessoa                                Int        @unique(map: "pessoa_id_pessoa_UNIQUE")
+  perfil_id_perfil                                Int
+  criador_id_usuario                              Int?
+  evento                                          evento[]
+  ingresso_ingresso_criador_id_usuarioTousuario   ingresso[] @relation("ingresso_criador_id_usuarioTousuario")
+  ingresso_ingresso_validador_id_usuarioTousuario ingresso[] @relation("ingresso_validador_id_usuarioTousuario")
+  perfil                                          perfil     @relation(fields: [perfil_id_perfil], references: [id_perfil], onUpdate: Restrict, map: "fk_usuario_perfil1")
+  usuario                                         usuario?   @relation("usuarioTousuario", fields: [criador_id_usuario], references: [id_usuario], map: "fk_usuario_usuario1")
+  other_usuario                                   usuario[]  @relation("usuarioTousuario")
+  pessoa                                          pessoa     @relation(fields: [pessoa_id_pessoa], references: [id_pessoa], map: "usuario_ibfk_1")
+
+  @@index([perfil_id_perfil], map: "fk_usuario_perfil1_idx")
+  @@index([pessoa_id_pessoa], map: "fk_usuario_pessoa_idx")
+  @@index([criador_id_usuario], map: "fk_usuario_usuario1_idx")
+}
+
+enum ingresso_situacao {
+  Emitido
+  Validado
+  Cancelado
+}
