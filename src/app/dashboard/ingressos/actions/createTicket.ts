@@ -23,7 +23,7 @@ export default async function createTicket(
   const { nome_completo, email, cpf, setor_id_setor } = validateData.data;
 
   try {
-    await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       const sector = await tx.setor.findUnique({
         where: { id_setor: setor_id_setor },
       });
@@ -68,7 +68,7 @@ export default async function createTicket(
       const nanoid = customAlphabet("1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ", 6);
 
       const code = nanoid();
-      await tx.ingresso.create({
+      const newTicket = await tx.ingresso.create({
         data: {
           codigo: code,
           setor_id_setor: sector.id_setor,
@@ -76,13 +76,32 @@ export default async function createTicket(
           situacao: "Emitido",
           criador_id_usuario: 14,
         },
+        include: {
+          pessoa: true,
+          setor: {
+            include: {
+              evento: {
+                select: {
+                  titulo_evento: true,
+                },
+              },
+            },
+          },
+        },
       });
+      return newTicket;
     });
 
     revalidatePath("/dashboard/ingressos");
     return {
       success: true,
       message: "Ingresso reservado com sucesso",
+      codigo: result.codigo,
+      nome: result.pessoa.nome_completo,
+      email: result.pessoa.email,
+      cpf: result.pessoa.cpf,
+      evento: result.setor.evento.titulo_evento,
+      setor: result.setor.titulo_setor,
     };
   } catch (error: any) {
     console.log(error);
