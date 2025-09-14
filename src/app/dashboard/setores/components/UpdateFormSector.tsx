@@ -4,14 +4,14 @@ import Input from "@/components/Input";
 import { FormState } from "@/types/formState";
 import React, { useActionState, useEffect } from "react";
 import Button from "@/components/Button";
-import updateSector from "../actions/updateSector"; // 🔥 corrigido nome
-import { sector } from "@/types/sectors";
+import updateSector from "../actions/updateSector"; 
+import { sectorWithEvent } from "@/types/sectors";
 import { event } from "@/types/event";
 import Dropdown from "@/components/Dropdown";
 import useFeedback from "@/hooks/useFeedback";
 
 interface UpdateSectorProps {
-  sector: sector;
+  sector: sectorWithEvent;
   events: event[];
 }
 
@@ -63,7 +63,7 @@ export default function UpdateSectorForm({
         name="evento_id_evento"
         placeholder="Selecione o evento do setor"
         options={eventsFiltered}
-        defaultValue={sector.evento?.id_evento}
+        defaultValue={sector.evento.id_evento}
       />
 
       <Button>Atualizar</Button>

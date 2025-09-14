@@ -77,7 +77,7 @@ export default async function updateUser(
       };
     return {
       success: false,
-      message: "Esse cpf já pertence a outro usuário",
+      message: error.message ?? "Erro ao atualizar usuário",
     };
   }
 }
