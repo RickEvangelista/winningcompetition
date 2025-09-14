@@ -22,7 +22,7 @@ model evento {
 
 model ingresso {
   id_ingresso                                    Int               @id @default(autoincrement())
-  codigo                                         String            @db.Char(6)
+  codigo                                         String            @unique(map: "codigo_UNIQUE") @db.Char(6)
   situacao                                       ingresso_situacao @default(Emitido)
   dt_validacao                                   DateTime?         @db.DateTime(0)
   setor_id_setor                                 Int

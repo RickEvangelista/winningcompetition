@@ -5,5 +5,5 @@ export const sectorSchema = z.object({
   capacidade: z.coerce
     .number()
     .positive("A capacidade mínima deve ser maior que 0"),
-  evento_id_evento: z.coerce.number().positive("Escolha um evento válido"),
+  evento_id_evento: z.coerce.number().positive("Selecione um evento válido"),
 });
