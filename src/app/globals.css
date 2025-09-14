@@ -9,3 +9,19 @@
   --color-custom-orange: #f44528;
 }
 
+@media print {
+  body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+  }
+
+  .print-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+  }
+
+}

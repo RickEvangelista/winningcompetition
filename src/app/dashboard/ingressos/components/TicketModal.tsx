@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useRef } from "react";
-import { useReactToPrint } from "react-to-print";
 import Ticket from "./Ticket";
+import { useReactToPrint } from "react-to-print";
 import Button from "@/components/Button";
 
 interface TicketModalProps {
@@ -18,39 +18,36 @@ interface TicketModalProps {
   } | null;
 }
 
-export default function TicketModal({ open, onClose, ticketData }: TicketModalProps) {
-  const ticketRef = useRef<HTMLDivElement>(null);
-
-  // ✅ use contentRef instead of print() callback
-  const handlePrint = useReactToPrint({
-    contentRef: ticketRef, // obrigatório na versão mais recente
-    documentTitle: ticketData ? `Ingresso-${ticketData.codigo}` : "Ingresso",
-  });
+export default function TicketModal({
+  open,
+  onClose,
+  ticketData,
+}: TicketModalProps) {
+  const contentRef = useRef<HTMLDivElement>(null);
+  const reactToPrintFn = useReactToPrint({ contentRef, documentTitle: `Ingresso: ${ticketData?.codigo}` });
 
   if (!open || !ticketData) return null;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
       <div className="bg-white rounded-xl p-6 shadow-lg max-w-md w-full">
-        <h1 className="text-xl font-bold text-custom-blue mb-4">
-          Ingresso criado!
-        </h1>
 
-        {/* O ref precisa estar aqui */}
-        <div ref={ticketRef} className="flex justify-center items-center">
-          <Ticket {...ticketData} />
+        <div className="print-container flex justify-center items-center">
+          <Ticket {...ticketData} ref={contentRef} />
         </div>
 
-        <div className="flex justify-end gap-4 mt-6">
+        <div className="flex justify-between mt-6 gap-2">
           <button
+            type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-lg bg-gray-300"
+            className="bg-white text-custom-blue border-4 border-custom-blue rounded-lg p-2 text-2xl font-semibold w-1/2"
           >
             Fechar
           </button>
           <Button
-          type="button"
-            onClick={handlePrint}
+            type="button"
+            onClick={reactToPrintFn}
+            className="w-1/2"
           >
             Baixar
           </Button>

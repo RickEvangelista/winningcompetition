@@ -11,28 +11,27 @@ interface TicketProps {
   codigo: string;
 }
 
-const Ticket = forwardRef<HTMLDivElement, TicketProps>(
-  ({ nome, email, cpf, evento, setor, codigo }, ref) => {
-    return (
-      <div
-        ref={ref}
-        className="p-6 w-[400px] border-2 border-custom-blue rounded-xl bg-white text-black"
-      >
-        <h2 className="text-2xl font-bold text-center mb-4 text-custom-blue">
-          Ingresso
-        </h2>
-        <p><strong>Nome:</strong> {nome}</p>
-        <p><strong>Email:</strong> {email}</p>
-        <p><strong>CPF:</strong> {cpf}</p>
-        <p><strong>Evento:</strong> {evento}</p>
-        <p><strong>Setor:</strong> {setor}</p>
-        <p className="mt-4 text-center font-mono text-xl">
-          <strong>Código:</strong> {codigo}
-        </p>
-      </div>
-    );
-  }
-);
+function TicketComponent({ nome, email, cpf, evento, setor, codigo,  }: TicketProps,  ref: React.Ref<HTMLDivElement>
+) {
+  return (
+    <div ref={ref} className="p-6 w-[400px] border-2 border-custom-blue rounded-xl bg-white text-black">
+      <h2 className="text-2xl font-bold text-center mb-4 text-custom-blue">
+        Ingresso
+      </h2>
+      <p className="font-semibold">Nome: {nome}</p>
+      <p className="font-semibold">Email: {email}</p>
+      <p className="font-semibold">CPF: {cpf}</p>
+      <p className="font-semibold">Evento: {evento}</p>
+      <p className="font-semibold">Setor: {setor}</p>
+      <p className="mt-4 text-center font-mono text-xl">
+        Código: {codigo}
+      </p>
+    </div>
+  );
+}
 
+
+const Ticket = forwardRef(TicketComponent);
 Ticket.displayName = "Ticket";
+
 export default Ticket;

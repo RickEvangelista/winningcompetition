@@ -23,7 +23,8 @@ export default function Input({
             "bg-custom-pink" : variant === "danger",
             "bg-custom-orange" : variant === "alert",
             "bg-custom-green" : variant === "success",
-        }
+        },
+        className
     )
 } type={type} disabled={disabled} {...props}>{children}</button>
   );
