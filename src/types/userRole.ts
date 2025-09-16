@@ -1,0 +1,1 @@
+export type Profile = "Administrador" | "Vendedor" | "Validador"

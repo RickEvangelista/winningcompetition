@@ -3,7 +3,7 @@
 import Input from "@/components/Input";
 import Button from "@/components/Button";
 import useFeedback from "@/hooks/useFeedback";
-import { signIn } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 
 export default function LoginForm() {
   const { showMessage } = useFeedback();
@@ -20,15 +20,22 @@ export default function LoginForm() {
     const result = await signIn("credentials", {
       identifier,
       password,
-      redirect: false, // evita CallbackRouteError e permite mensagens personalizadas
+      redirect: false,
     });
 
     if (result?.error) {
-      showMessage({ success: false, message: result.error });
-    } else {
-      showMessage({ success: true, message: "Login realizado com sucesso!" });
-      window.location.href = "/dashboard";
+      showMessage({ success: false, message: "Usuário ou senha inválidos"});
+      return;
     }
+
+    let redirectUrl = "/"
+    const session = await getSession();
+    const profile = session?.user?.profile;
+    if(profile === "Administrador") redirectUrl = "/dashboard/eventos"
+    if(profile === "Vendedor") redirectUrl = "/dashboard/ingressos/criar"
+    if(profile === "Validador") redirectUrl = "/dashboard/validacao"
+
+    window.location.href = redirectUrl;
   };
 
   return (

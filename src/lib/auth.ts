@@ -3,16 +3,16 @@ import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import prisma from "./prisma";
 import { signInSchema } from "@/app/dashboard/login/schemas/signInSchema";
-import { ZodError } from "zod";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   pages: { signIn: "/" },
   session: { strategy: "jwt" },
   providers: [
     Credentials({
+      id: "credentials",
       credentials: {
-        identifier: {},
-        password: {},
+        identifier: { label: "Email ou CPF", type: "text" },
+        password: { label: "Senha:", type: "password" },
       },
       authorize: async (credentials) => {
         try {
@@ -30,10 +30,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             include: { pessoa: true, perfil: true },
           });
 
-          if (!user) throw new Error("Usuário não encontrado");
+          if (!user) return null;
 
           const verifyPassword = await bcrypt.compare(password, user.senha);
-          if (!verifyPassword) throw new Error("Senha incorreta");
+
+          if (!verifyPassword) return null;
 
           return {
             id: String(user.id_usuario),
@@ -41,11 +42,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             email: user.pessoa.email,
             profile: user.perfil.titulo_perfil,
           };
+          
         } catch (error: any) {
-          if (error instanceof ZodError) {
-            throw new Error("Dados inválidos");
-          }
-          throw new Error(error.message ?? "Erro ao fazer login");
+          return null;
         }
       },
     }),

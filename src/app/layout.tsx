@@ -1,14 +1,19 @@
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
+import Header from "@/components/Header";
+import { auth } from "@/lib/auth";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+  const session = await auth()
   return (
     <html lang="en">
-      <body className={`flex-flex col px-20 py-5`}>
+      <body className={`flex flex-col px-4 py-2 md:px-20 md:py-5`}>
+        <Header isLoggedIn={!!session} userRole={"Administrador"} />
         {children}
         <Toaster
           toastOptions={{

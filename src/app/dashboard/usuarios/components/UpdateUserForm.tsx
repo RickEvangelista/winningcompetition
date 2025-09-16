@@ -6,7 +6,7 @@ import InputMasked from "@/components/InputMasked";
 import { FormState } from "@/types/formState";
 import React, { useActionState, useEffect } from "react";
 import Button from "@/components/Button";
-import { user } from "@/user";
+import { user } from "@/types/user";
 import updateUser from "../actions/updateUser";
 import useFeedback from "@/hooks/useFeedback";
 
