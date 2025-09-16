@@ -1,15 +1,10 @@
-"use client";
+import React from 'react'
+import LoginForm from './dashboard/login/components/LoginForm'
 
-import { useReactToPrint } from "react-to-print";
-import { useRef } from "react";
-
-export default function TestTube() {
-  const contentRef = useRef<HTMLDivElement>(null);
-  const reactToPrintFn = useReactToPrint({ contentRef });
+export default function page() {
   return (
-    <div>
-      <button onClick={reactToPrintFn}>Print</button>
-      <div ref={contentRef}>Content to print</div>
+    <div className='flex flex-col min-h-screen w-full justify-center items-center'>
+      <LoginForm />
     </div>
-  );
+  )
 }

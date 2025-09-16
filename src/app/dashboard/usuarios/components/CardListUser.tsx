@@ -2,7 +2,7 @@
 
 import Button from "@/components/Button";
 import Input from "@/components/Input";
-import { user } from "@/types/user";
+import { user } from "@/user";
 import Link from "next/link";
 import React, { useState } from "react";
 import deleteUser from "../actions/deleteUser";
