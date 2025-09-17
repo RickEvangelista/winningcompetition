@@ -6,7 +6,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string;
 }
 
-export default function Input({
+export default function Button ({
     variant= "primary",
     className = "w-full",
     disabled=false,

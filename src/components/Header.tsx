@@ -3,12 +3,14 @@
 import Link from "next/link";
 import Image from "next/image";
 import React, { useState } from "react";
-import { User, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Profile } from "@/types/userRole";
+import Button from "./Button";
+import { signOut } from "next-auth/react";
 
 interface HeaderProps {
   isLoggedIn: boolean;
-  userRole: Profile;
+  userRole?: Profile;
 }
 
 const menuLinks: Record<Profile, { href: string; label: string }[]> = {
@@ -35,23 +37,14 @@ function Header({ isLoggedIn, userRole }: HeaderProps) {
   const links = userRole ? menuLinks[userRole] : [];
   const logoLink = isLoggedIn && userRole ? initialPage[userRole] : "/";
 
-  const mobileLinks = [
-    ...links,
-    isLoggedIn
-      ? { href: "/dashboard/perfil", label: "Perfil" }
-      : { href: "/login", label: "Login" },
-  ];
-
   return (
-    <header className="w-full bg-white p-5 flex items-center justify-between relative">
-      {/* Logo à esquerda */}
+    <header className="w-full bg-white p-5 flex items-center relative">
       <div className="flex-shrink-0">
         <Link href={logoLink}>
           <Image src="/vertical_logo.svg" width={200} height={140} alt="Logo" />
         </Link>
       </div>
 
-      {/* Links centralizados */}
       <ul className="hidden lg:flex gap-8 absolute left-1/2 transform -translate-x-1/2">
         {links.map((link) => (
           <li key={link.href}>
@@ -65,44 +58,50 @@ function Header({ isLoggedIn, userRole }: HeaderProps) {
         ))}
       </ul>
 
-      {/* Ícone de perfil à direita */}
-      <div className="flex items-center md:flex-shrink-0">
+      <div className="ml-auto flex items-center gap-4">
         <div className="md:hidden">
-          {/* Menu mobile toggle */}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="focus:outline-none"
-          >
+          <button aria-label="Abrir menu" onClick={() => setMenuOpen(!menuOpen)}>
             {menuOpen ? <X size={32} /> : <Menu size={32} />}
           </button>
         </div>
 
-        <div className="hidden md:block ml-4">
-          {isLoggedIn ? (
-            <Link href="/dashboard/perfil">
-              <User size={36} className="text-custom-dark-gray hover:text-custom-blue transition-colors" />
-            </Link>
-          ) : (
-            <Link href="/login">
-              <User size={36} className="text-custom-dark-gray hover:text-custom-blue transition-colors" />
-            </Link>
-          )}
-        </div>
+        {isLoggedIn && (
+          <div className="hidden md:block">
+            <Button onClick={() => signOut({ callbackUrl: "/" })} variant="alert">
+              Logout
+            </Button>
+          </div>
+        )}
       </div>
 
-      {/* Menu mobile aside */}
       {menuOpen && (
-        <aside className="fixed top-0 right-0 w-64 h-full bg-white shadow-lg z-50 p-5 flex flex-col gap-3">
-          {mobileLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="block px-4 py-2 text-custom-dark-gray hover:bg-custom-blue hover:text-white rounded transition-colors"
-              onClick={() => setMenuOpen(false)}
-            >
-              {link.label}
-            </Link>
-          ))}
+        <aside className="fixed top-0 right-0 w-64 h-full bg-white shadow-lg z-50 p-6 flex flex-col">
+          <nav className="flex flex-col gap-3">
+            {links.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="block px-4 py-2 text-custom-dark-gray hover:bg-custom-blue hover:text-white rounded transition-colors"
+                onClick={() => setMenuOpen(false)}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+
+          <div className="mt-auto pt-4 border-t border-gray-100">
+            {isLoggedIn && (
+              <Button
+                onClick={() => {
+                  setMenuOpen(false); // fecha o menu antes de deslogar
+                  signOut({ callbackUrl: "/" });
+                }}
+                variant="alert"
+              >
+                Logout
+              </Button>
+            )}
+          </div>
         </aside>
       )}
     </header>
