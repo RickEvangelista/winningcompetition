@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import Link from "next/link";
 import Image from "next/image";
@@ -59,22 +59,30 @@ function Header({ isLoggedIn, userRole }: HeaderProps) {
       </ul>
 
       <div className="ml-auto flex items-center gap-4">
-        <div className="md:hidden">
-          <button aria-label="Abrir menu" onClick={() => setMenuOpen(!menuOpen)}>
-            {menuOpen ? <X size={32} /> : <Menu size={32} />}
-          </button>
-        </div>
+        {userRole === "Administrador" && (
+          <div className="md:hidden">
+            <button
+              aria-label="Abrir menu"
+              onClick={() => setMenuOpen(!menuOpen)}
+            >
+              {menuOpen ? <X size={32} /> : <Menu size={32} />}
+            </button>
+          </div>
+        )}
 
         {isLoggedIn && (
           <div className="hidden md:block">
-            <Button onClick={() => signOut({ callbackUrl: "/" })} variant="alert">
+            <Button
+              onClick={() => signOut({ callbackUrl: "/" })}
+              variant="alert"
+            >
               Logout
             </Button>
           </div>
         )}
       </div>
 
-      {menuOpen && (
+      {menuOpen && userRole === "Administrador" && (
         <aside className="fixed top-0 right-0 w-64 h-full bg-white shadow-lg z-50 p-6 flex flex-col">
           <nav className="flex flex-col gap-3">
             {links.map((link) => (
