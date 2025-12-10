@@ -33,7 +33,7 @@ export default function UpdateEventForm({ event }: UpdateEventFormProps) {
       </h1>
       <input type="hidden" name="id_evento" value={event.id_evento} />
       <Input
-        label={"Titulo evento: "}
+        label={"Título do evento: "}
         name={"titulo_evento"}
         placeholder={"Digite o titulo do evento"}
         defaultValue={event.titulo_evento}

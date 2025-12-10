@@ -1,28 +1,33 @@
-"use server"
+"use server";
 
-import prisma from "@/lib/prisma"
+import prisma from "@/lib/prisma";
 
-
-export async function getReportsData(eventoId: number) {
-  const setores = await prisma.setor.findMany({
-    where: { evento_id_evento: eventoId },
+export async function getAllEventsReports(eventoId: number) {
+  const events = await prisma.evento.findMany({
     include: {
-      ingresso: true,
+      setor: {
+        include: { ingresso: true},
+      },
     },
-  })
+  });
 
-  return setores.map((setor) => {
-    const vendidos = setor.ingresso.length
-    const validados = setor.ingresso.filter(i => i.situacao === "Validado").length
-    const ocupacao = (vendidos / setor.capacidade) * 100
+  return  events.map((event) => ({
+    id: event.id_evento,
+    titulo: event.titulo_evento,
+    setores: event.setor.map((sector)=> {
+      const vendidos = sector.ingresso.length;
+      const validados = sector.ingresso.filter((i)=> i.situacao === "Validado").length;
 
-    return {
-      nome: setor.titulo_setor,
-      vendidos,
-      validados,
-      capacidade: setor.capacidade,
-      ocupacao,
-      status: ocupacao >= 100 ? "Esgotado" : ocupacao >= 90 ? "Crítico" : "Disponível",
-    }
-  })
+      const ocupacao = (vendidos / sector.capacidade) * 100;
+      return {
+        nome: sector.titulo_setor,
+        vendidos,
+        validados,
+        capacidade: sector.capacidade,
+        ocupacao,
+        status:
+        ocupacao >= 100 ? "Esgotado" : ocupacao >= 80 ? "Crítico" : "Disponível",
+      }
+    })
+  }))
 }

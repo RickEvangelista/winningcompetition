@@ -1,7 +1,13 @@
-import { evento } from "@prisma/client";
+import { evento, setor } from "@prisma/client";
+
+export interface sectorWithCount extends setor {
+    _count: {
+        ingresso: number;
+    }
+}
 
 export interface event extends evento {
-    
+    setor: sectorWithCount[];
 }
 
 

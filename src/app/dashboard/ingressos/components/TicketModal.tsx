@@ -32,7 +32,7 @@ export default function TicketModal({
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
       <div className="bg-white rounded-xl p-6 shadow-lg max-w-md w-full">
 
-        <div className="print-container flex justify-center items-center">
+        <div className="flex justify-center items-center print-container">
           <Ticket {...ticketData} ref={contentRef} />
         </div>
 

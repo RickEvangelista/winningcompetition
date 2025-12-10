@@ -30,9 +30,14 @@ export default async function updateTicket(
   const { nome_completo, email, cpf, setor_id_setor } = validateData.data;
 
   try {
+    let updatedTicket: any = null;
+
     await prisma.$transaction(async (tx) => {
       const sector = await tx.setor.findUnique({
         where: { id_setor: setor_id_setor },
+        include: {
+          evento: true,
+        },
       });
 
       if (!sector) throw new Error("Setor não encontrado");
@@ -54,20 +59,12 @@ export default async function updateTicket(
 
       if (!person) {
         person = await tx.pessoa.create({
-          data: {
-            nome_completo,
-            email,
-            cpf,
-          },
+          data: { nome_completo, email, cpf },
         });
       } else {
-        await tx.pessoa.update({
+        person = await tx.pessoa.update({
           where: { cpf },
-          data: {
-            nome_completo,
-            email,
-            cpf,
-          },
+          data: { nome_completo, email, cpf },
         });
       }
 
@@ -75,18 +72,26 @@ export default async function updateTicket(
         where: {
           pessoa_id_pessoa: person.id_pessoa,
           setor: { evento_id_evento: sector.evento_id_evento },
-          NOT: {id_ingresso},
+          NOT: { id_ingresso },
         },
       });
 
       if (ticketForCpf >= 5)
-        throw new Error("Limite de ingressos por cpf atingido");
+        throw new Error("Limite de ingressos por CPF atingido");
 
-      await tx.ingresso.update({
+      updatedTicket = await tx.ingresso.update({
         where: { id_ingresso },
         data: {
           setor_id_setor: sector.id_setor,
           pessoa_id_pessoa: person.id_pessoa,
+        },
+        include: {
+          pessoa: true,
+          setor: {
+            include: {
+              evento: true,
+            },
+          },
         },
       });
     });
@@ -95,6 +100,12 @@ export default async function updateTicket(
     return {
       success: true,
       message: "Ingresso atualizado com sucesso",
+      codigo: updatedTicket.codigo,
+      nome: updatedTicket.pessoa.nome_completo,
+      email: updatedTicket.pessoa.email,
+      cpf: updatedTicket.pessoa.cpf,
+      evento: updatedTicket.setor.evento.titulo_evento,
+      setor: updatedTicket.setor.titulo_setor,
     };
   } catch (error: any) {
     console.log(error);

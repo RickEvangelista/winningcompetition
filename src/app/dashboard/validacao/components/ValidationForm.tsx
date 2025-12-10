@@ -19,7 +19,7 @@ export default function ValidateTicketForm() {
 
   return (
     <form action={dispatch} className="w-full md:w-100 flex flex-col p-5 gap-5 border-4 border-custom-blue rounded-lg">
-        <h1 className="text-4xl font-semibold text-center text-custom-blue">Validar Ingresso</h1>
+        <h1 className="text-4xl font-semibold text-center text-custom-blue">Validar ingresso</h1>
         <Input label={'Código: '} name={'codigo'} placeholder={'Digite o código do ingresso'} />
         <Button>Validar</Button>
     </form>

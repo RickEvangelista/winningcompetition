@@ -18,8 +18,7 @@ export default async function createSector(
       message: validateData.error.issues[0]?.message ?? "Dados inválidos",
     };
 
-  const { titulo_setor, capacidade, evento_id_evento } =
-    validateData.data;
+  const { titulo_setor, capacidade, evento_id_evento } = validateData.data;
 
   try {
     await prisma.$transaction(async (tx) => {
@@ -28,52 +27,42 @@ export default async function createSector(
         include: { setor: true },
       });
 
-      if (!event)
-        return {
-          success: false,
-          message: "Evento não encontrado no sistema",
-        };
+      if (!event) throw new Error("Evento não encontrado no sistema");
 
       const sectorExists = event.setor.find(
-        (s) => s.titulo_setor === titulo_setor
+        (s) => s.titulo_setor.toLowerCase() === titulo_setor.toLowerCase()
       );
 
-      if (sectorExists)
-        return {
-          success: false,
-          message: "Setor com esse título já existe",
-        };
+      if (sectorExists) throw new Error("Esse setor já existe no evento");
 
       const oldCapacity = event.setor.reduce((acc, s) => acc + s.capacidade, 0);
 
       const newCapacity = oldCapacity + capacidade;
 
       if (newCapacity > event.capacidade)
-        return {
-          success: false,
-          message: "A capacidade do setor excede a capacidade restante do evento",
-        };
+        throw new Error(
+          "A capacidade do setor excede a capacidade restante do evento"
+        );
 
       await tx.setor.create({
         data: {
           titulo_setor,
           capacidade,
-          evento_id_evento: event.id_evento
+          evento_id_evento: event.id_evento,
         },
       });
-
     });
 
     revalidatePath("/dashboard/setores");
     return {
       success: true,
-      message: "Setor cadastrado com sucesso",
+      message: "Setor cadastrado com sucesso!",
     };
   } catch (error: any) {
     console.log(error);
+    return {
+      success: false,
+      message: error.message ?? "Erro ao cadastrar setor",
+    };
   }
-  return {
-    success: false,
-    message: "Erro ao cadastrar setor",
-  };
 }

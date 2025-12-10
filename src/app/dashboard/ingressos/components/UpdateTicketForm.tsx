@@ -11,67 +11,118 @@ import { eventList } from "@/types/event";
 import { sector } from "@/types/sectors";
 import { ticket } from "@/types/tickets";
 import updateTicket from "../actions/updateTicket";
+import TicketModal from "./TicketModal";
 
 interface UpdateTicketFormProps {
   events: eventList[];
   sectors: sector[];
-  ticket: ticket,
+  ticket: ticket;
 }
 
-export default function UpdateTicketForm({events, sectors, ticket}: UpdateTicketFormProps) {
+export default function UpdateTicketForm({
+  events,
+  sectors,
+  ticket,
+}: UpdateTicketFormProps) {
   const initialState: FormState = { success: false, message: "" };
+
   const [state, dispatch] = useActionState(updateTicket, initialState);
-  const [selectedEvent, setSelectedEvent ] = useState<number | null>(ticket.setor.evento_id_evento)
+  const [selectedEvent, setSelectedEvent] = useState<number | null>(
+    ticket.setor.evento_id_evento
+  );
+
+  const [openModal, setOpenModal] = useState(false);
   const { showMessage } = useFeedback();
 
   useEffect(() => {
-    state.message && showMessage(state);
+    if (state.message) showMessage(state);
+    if (state.success && state.codigo) setOpenModal(true);
   }, [state, showMessage]);
 
+  const eventsList = events.map((e) => ({
+    label: e.titulo_evento,
+    value: e.id_evento,
+  }));
 
-  const eventsList = events.map((e)=> ({
-    label: e.titulo_evento, value: e.id_evento
-  }))
+  const filteredSectors = selectedEvent
+    ? sectors.filter((s) => s.evento_id_evento === selectedEvent)
+    : [];
 
-  const filteredSectors = selectedEvent ? sectors.filter((s)=> s.evento_id_evento === selectedEvent) : []
-
-    const sectorList = filteredSectors.map((e)=> ({
-    label: e.titulo_setor, value: e.id_setor
-  }))
-
+  const sectorList = filteredSectors.map((e) => ({
+    label: e.titulo_setor,
+    value: e.id_setor,
+  }));
 
   return (
-    <form
-      action={dispatch}
-      className="w-full md:w-100 flex flex-col p-5 gap-5 border-4 border-custom-blue rounded-lg"
-    >
-      <h1 className="text-4xl font-semibold text-center text-custom-blue">
-        Atualizar ingresso
-      </h1>
+    <>
+      <form
+        action={dispatch}
+        className="w-full md:w-100 flex flex-col p-5 gap-5 border-4 border-custom-blue rounded-lg"
+      >
+        <h1 className="text-4xl font-semibold text-center text-custom-blue">
+          Atualizar ingresso
+        </h1>
 
-      <input type="hidden" name="id_ingresso" value={ticket.id_ingresso} />
-      <Input
-        label={"Nome: "}
-        name={"nome_completo"}
-        placeholder={"Digite o nome completo"} defaultValue={ticket.pessoa.nome_completo}
+        <input type="hidden" name="id_ingresso" value={ticket.id_ingresso} />
+
+        <Input
+          label="Nome: "
+          name="nome_completo"
+          placeholder="Digite o nome completo"
+          defaultValue={ticket.pessoa.nome_completo}
+        />
+
+        <Input
+          label="Email:"
+          name="email"
+          placeholder="Digite o email"
+          defaultValue={ticket.pessoa.email}
+        />
+
+        <InputMasked
+          label="CPF:"
+          name="cpf"
+          placeholder="Digite o cpf"
+          defaultValue={ticket.pessoa.cpf}
+        />
+
+        <Dropdown
+          label="Evento:"
+          name="evento_id_evento"
+          placeholder="Selecione um evento"
+          options={eventsList}
+          defaultValue={ticket.setor.evento_id_evento}
+          onChange={(e) => setSelectedEvent(Number(e.target.value))}
+        />
+
+        <Dropdown
+          label="Setor:"
+          name="setor_id_setor"
+          placeholder="Selecione um setor"
+          disabled={!selectedEvent}
+          options={sectorList}
+          defaultValue={ticket.setor_id_setor}
+        />
+
+        <Button>Atualizar</Button>
+      </form>
+
+      <TicketModal
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        ticketData={
+          state.codigo
+            ? {
+                nome: state.nome!,
+                email: state.email!,
+                cpf: state.cpf!,
+                evento: state.evento!,
+                setor: state.setor!,
+                codigo: state.codigo!,
+              }
+            : null
+        }
       />
-      <Input label={"Email:"} name={"email"} placeholder={"Digite o email"} defaultValue={ticket.pessoa.email} />
-      <InputMasked label={"CPF:"} name={"cpf"} placeholder={"Digite o cpf"} defaultValue={ticket.pessoa.cpf} />
-      <Dropdown
-        label={"Evento:"}
-        name={"evento_id_evento"}
-        placeholder={"Selecione um evento"}
-        options={eventsList}
-        onChange={(e) => setSelectedEvent(Number(e.target.value))} defaultValue={ticket.setor.evento_id_evento}
-      />
-      <Dropdown
-        label={"Setor:"}
-        name={"setor_id_setor"}
-        placeholder={"Selecione um setor"}
-        disabled={!selectedEvent}
-        options={sectorList} defaultValue={ticket.setor_id_setor}
-      />
-      <Button>Atualizar</Button>
-    </form>
+    </>
   );
 }

@@ -5,17 +5,16 @@ import { FormState } from "@/types/formState";
 import React, { useActionState, useEffect } from "react";
 import Button from "@/components/Button";
 import createEvent from "../actions/createEvent";
-import toast from "react-hot-toast";
+import useFeedback from "@/hooks/useFeedback";
 
 export default function CreateEventForm() {
   const initialState: FormState = { success: false, message: "" };
   const [state, dispatch] = useActionState(createEvent, initialState);
+  const { showMessage } = useFeedback();
 
   useEffect(() => {
-    state.message && state.success
-      ? toast.success(state.message)
-      : toast.error(state.message);
-  }, [state]);
+    state.message && showMessage(state);
+  }, [state, showMessage]);
 
   return (
     <form
@@ -26,7 +25,7 @@ export default function CreateEventForm() {
         Cadastrar evento
       </h1>
       <Input
-        label={"Titulo evento: "}
+        label={"Título do evento: "}
         name={"titulo_evento"}
         placeholder={"Digite o titulo do evento"}
       />
@@ -48,15 +47,6 @@ export default function CreateEventForm() {
         type="number"
         placeholder={"Digite a capacidade do evento"}
       />
-      {state.message && (
-        <p
-          className={`text-xl text-center ${
-            state.success ? "text-custom-green" : "text-custom-orange"
-          }`}
-        >
-          {state.message}
-        </p>
-      )}
       <Button>Cadastrar</Button>
     </form>
   );

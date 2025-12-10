@@ -3,6 +3,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import { auth } from "@/lib/auth";
 import { Profile } from "@/types/userRole";
+import Footer from "@/components/Footer";
 
 export default async function RootLayout({
   children,
@@ -14,7 +15,7 @@ export default async function RootLayout({
   const profile = session?.user.profile as Profile;
   return (
     <html lang="en">
-      <body className={`flex flex-col px-4 py-2 md:px-20 md:py-5`}>
+      <body className={`flex flex-col justify-between px-4 py-2 md:px-20 md:py-5 min-h-screen`}>
         <Header isLoggedIn={!!session} userRole={profile} />
         {children}
         <Toaster
@@ -39,6 +40,7 @@ export default async function RootLayout({
             },
           }}
         />
+        <Footer/>
       </body>
     </html>
   );

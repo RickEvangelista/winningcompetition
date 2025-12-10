@@ -38,19 +38,19 @@ function Header({ isLoggedIn, userRole }: HeaderProps) {
   const logoLink = isLoggedIn && userRole ? initialPage[userRole] : "/";
 
   return (
-    <header className="w-full bg-white p-5 flex items-center relative">
+    <header className="w-full bg-white py-5 flex items-center relative">
       <div className="flex-shrink-0">
         <Link href={logoLink}>
           <Image src="/vertical_logo.svg" width={200} height={140} alt="Logo" />
         </Link>
       </div>
 
-      <ul className="hidden lg:flex gap-8 absolute left-1/2 transform -translate-x-1/2">
+      <ul className="hidden xl:flex gap-8 absolute left-1/2 transform -translate-x-1/2">
         {links.map((link) => (
           <li key={link.href}>
             <Link
               href={link.href}
-              className="text-custom-dark-gray hover:text-custom-blue transition-colors font-medium"
+              className="text-custom-dark-gray hover:underline transition-colors font-medium text-xl"
             >
               {link.label}
             </Link>
@@ -60,31 +60,46 @@ function Header({ isLoggedIn, userRole }: HeaderProps) {
 
       <div className="ml-auto flex items-center gap-4">
         {userRole === "Administrador" && (
-          <div className="md:hidden">
+          <div className="xl:hidden">
             <button
               aria-label="Abrir menu"
-              onClick={() => setMenuOpen(!menuOpen)}
+              onClick={() => setMenuOpen((prev) => !prev)}
             >
               {menuOpen ? <X size={32} /> : <Menu size={32} />}
             </button>
           </div>
         )}
 
-        {isLoggedIn && (
-          <div className="hidden md:block">
+        {isLoggedIn ? (
+          <div className="hidden xl:block">
             <Button
               onClick={() => signOut({ callbackUrl: "/" })}
               variant="alert"
             >
-              Logout
+              Encerrar sessão
             </Button>
           </div>
+        ) : (
+          <Image src="/logo_invert.svg" width={100} height={70} alt="Logo" />
         )}
       </div>
 
+      {/* 🔥 Overlay escuro quando o menu abre */}
+      {menuOpen && <div className="fixed inset-0 bg-black/40 z-40"></div>}
+
+      {/* 🔥 Menu lateral */}
       {menuOpen && userRole === "Administrador" && (
         <aside className="fixed top-0 right-0 w-64 h-full bg-white shadow-lg z-50 p-6 flex flex-col">
-          <nav className="flex flex-col gap-3">
+          {/* Botão X interno */}
+          <button
+            className="absolute top-4 right-4"
+            onClick={() => setMenuOpen(false)}
+            aria-label="Fechar menu"
+          >
+            <X size={28} />
+          </button>
+
+          <nav className="flex flex-col gap-3 mt-10">
             {links.map((link) => (
               <Link
                 key={link.href}
@@ -101,12 +116,12 @@ function Header({ isLoggedIn, userRole }: HeaderProps) {
             {isLoggedIn && (
               <Button
                 onClick={() => {
-                  setMenuOpen(false); // fecha o menu antes de deslogar
+                  setMenuOpen(false);
                   signOut({ callbackUrl: "/" });
                 }}
                 variant="alert"
               >
-                Logout
+                Encerrar sessão
               </Button>
             )}
           </div>

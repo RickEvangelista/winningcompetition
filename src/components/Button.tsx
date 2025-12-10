@@ -17,7 +17,7 @@ export default function Button ({
   return (
 <button className={
     clsx(
-        "p-2 text-white text-2xl font-semibold rounded-lg",
+        "p-2 text-white text-2xl font-semibold rounded-lg hover:brightness-90 cursor-pointer",
         {
             "bg-custom-blue" : variant === "primary",
             "bg-custom-pink" : variant === "danger",

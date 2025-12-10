@@ -9,13 +9,31 @@ import CardListEvents from "./components/CardListEvents";
 export default async function page() {
   const events = await prisma.evento.findMany({
     orderBy: { id_evento: "desc" },
+    include: {
+      setor: {
+        include: {
+          _count: {
+            select: {
+              ingresso: {
+                where: {
+                  situacao: {
+                    in : ["Emitido", "Validado"]
+                  }
+                }
+            }
+          }
+          }
+        }
+      }
+    },
   });
+  
   return (
     <div className="flex flex-col min-h-screen w-full gap-5">
       <div className="flex flex-col md:flex-row justify-between items-center">
-        <h1 className="text-5xl font-semibold">Gerenciar Eventos</h1>
+        <h1 className="text-5xl font-semibold">Gerenciar eventos</h1>
         <Link href={`/dashboard/eventos/criar`}>
-          <Button type="button">Novo Evento</Button>
+          <Button type="button">Novo evento</Button>
         </Link>
       </div>
       <CardListEvents events={events} />

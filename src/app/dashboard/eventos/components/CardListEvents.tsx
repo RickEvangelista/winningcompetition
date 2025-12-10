@@ -23,7 +23,7 @@ export default function CardListEvents({ events }: CardListEventsProps) {
     };
     
     const filteredItems = events.filter((i) =>
-      i.titulo_evento.toLowerCase().includes(search.toLocaleLowerCase())
+      i.titulo_evento.toLowerCase().includes(search.toLowerCase())
     );
   
   return (
@@ -31,7 +31,7 @@ export default function CardListEvents({ events }: CardListEventsProps) {
       <Input
         label={""}
         name={"filter"}
-        placeholder={"Filtre usuários por nome ou perfil"}
+        placeholder={"Filtrar evento pelo nome"}
         onChange={(e) => setSearch(e.target.value)}
       />
 
@@ -43,7 +43,7 @@ export default function CardListEvents({ events }: CardListEventsProps) {
             {filteredItems.map((i) => (
               <div
                 key={i.id_evento}
-                className="flex flex-col border-t-4 border-custom-blue rounded-md shadow-md hover:shadow-lg transition-shadow gap-4 p-5"
+                className="flex flex-col border-t-4 border-custom-yellow rounded-md shadow-md hover:shadow-lg transition-shadow gap-4 p-5"
               >
                 <h3 className="text-3xl font-sembold">{i.titulo_evento}</h3>
                 <p className="text-2xl">{`${i.dt_inicio.toLocaleDateString(
@@ -52,8 +52,8 @@ export default function CardListEvents({ events }: CardListEventsProps) {
                 )} até ${i.dt_fim.toLocaleDateString("pt-BR", {
                   timeZone: "UTC",
                 })}`}</p>
-                <p className="text-2xl">{i.capacidade}</p>
-                <p className="text-2xl">{i.id_evento}</p>
+                <p className="text-2xl">Total: {i.capacidade}</p>
+                <p className="text-2xl">Vendidos: {i.setor.reduce((acc, s) => acc + s._count.ingresso, 0)}</p>
                 <div className="flex justify-between items-center">
                   <Link
                     className="text-custom-blue text-2xl hover:underline w-1/2"

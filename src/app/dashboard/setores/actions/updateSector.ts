@@ -26,8 +26,7 @@ export default async function updateSector(
       message: validateData.error.issues[0]?.message ?? "Dados inválidos",
     };
 
-  const { titulo_setor, capacidade, evento_id_evento } =
-    validateData.data;
+  const { titulo_setor, capacidade, evento_id_evento } = validateData.data;
 
   try {
     await prisma.$transaction(async (tx) => {
@@ -36,42 +35,31 @@ export default async function updateSector(
         include: { setor: true },
       });
 
-      if (!event)
-        return {
-          success: false,
-          message: "Evento não encontrado no sistema",
-        };
+      if (!event) throw new Error("Evento não encontrado no sistema");
 
       const sector = await tx.setor.findUnique({
         where: { id_setor },
       });
 
-      if (!sector)
-        return {
-          success: false,
-          message: "Setor não encontrado no sistema",
-        };
+      if (!sector) throw new Error("Setor não encontrado no sistema");
 
-      const sectorExists = event.setor.find(
-        (s) => s.titulo_setor === titulo_setor
+      const duplicatedName = event.setor.find(
+        (s) => s.titulo_setor.toLowerCase() === titulo_setor.toLowerCase() && s.id_setor !== id_setor
       );
 
-      if (sectorExists && sectorExists?.id_setor !== id_setor)
-        return {
-          success: false,
-          message: "Setor com esse título já existe",
-        };
+      if (duplicatedName) throw new Error("Esse setor já existe no evento");
 
-      const oldCapacity = event.setor.reduce((acc, s) => acc + s.capacidade, 0);
+      const currentCapacity = event.setor.reduce(
+        (acc, s) => acc + s.capacidade,
+        0
+      );
 
-      const newCapacity = oldCapacity + capacidade - sector.capacidade;
+      const newCapacity = currentCapacity - sector.capacidade + capacidade;
 
       if (newCapacity > event.capacidade)
-        return {
-          success: false,
-          message:
-            "A nova capacidade do setor excede a capacidade restante do evento",
-        };
+        throw new Error(
+          "A capacidade do setor excede a capacidade restante do evento"
+        );
 
       await tx.setor.update({
         where: { id_setor },
@@ -85,13 +73,13 @@ export default async function updateSector(
     revalidatePath("/dashboard/setores");
     return {
       success: true,
-      message: "Setor atualizado com sucesso"
+      message: "Setor atualizado com sucesso",
     };
   } catch (error: any) {
     console.log(error);
     return {
       success: false,
-      message: error.message ?? "Erro ao atualizar setor"
+      message: error.message ?? "Erro ao atualizar setor",
     };
   }
 }

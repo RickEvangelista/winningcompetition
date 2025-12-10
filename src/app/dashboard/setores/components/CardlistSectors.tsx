@@ -13,7 +13,7 @@ interface CardlistSectorsProps {
 }
 
 export default function CardlistSectors({ sectors }: CardlistSectorsProps) {
-  const [search, setSearch] = useState("");
+  const [search, setSearch ] = useState("");
     const { showMessage } = useFeedback();
   
 
@@ -23,14 +23,13 @@ export default function CardlistSectors({ sectors }: CardlistSectorsProps) {
   }
 
   const filteredItems = sectors.filter((i) =>
-    i.titulo_setor.toLowerCase().includes(search.toLocaleLowerCase())
-  );
+    i.titulo_setor.toLowerCase().includes(search.toLowerCase()) || i.evento.titulo_evento.toLowerCase().includes(search.toLowerCase()));
   return (
     <div className="flex flex-col gap-5">
       <Input
         label={""}
         name={"filter"}
-        placeholder={"Filtre usuários por nome ou perfil"}
+        placeholder={"Filtrar setor pelo nome ou evento"}
         onChange={(e) => setSearch(e.target.value)}
       />
       <div className="flex flex-col">
@@ -41,7 +40,7 @@ export default function CardlistSectors({ sectors }: CardlistSectorsProps) {
             {filteredItems.map((i) => (
               <div
                 key={i.id_setor}
-                className="flex flex-col border-t-4 border-custom-blue rounded-lg shadow-md hover:shadow-lg transition-shadow gap-4 p-5"
+                className="flex flex-col border-t-4 border-custom-pink rounded-lg shadow-md hover:shadow-lg transition-shadow gap-4 p-5"
               >
                 <h3 className="text-3xl font-sembold">{i.titulo_setor}</h3>
                 <p className="text-2xl">{i.capacidade}</p>

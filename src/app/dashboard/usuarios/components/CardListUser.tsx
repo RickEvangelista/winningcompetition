@@ -24,15 +24,15 @@ export default function CardListUser({ users }: CardListUserProps) {
     (i) =>
       i.pessoa.nome_completo
         .toLowerCase()
-        .includes(search.toLocaleLowerCase()) ||
-      i.perfil.titulo_perfil.toLowerCase().includes(search.toLocaleLowerCase())
+        .includes(search.toLowerCase()) ||
+      i.perfil.titulo_perfil.toLowerCase().includes(search.toLowerCase())
   );
   return (
     <div className="flex flex-col gap-5">
       <Input
         label={""}
         name={"filter"}
-        placeholder={"Filtre usuários por nome ou perfil"}
+        placeholder={"Filtrar usuário por nome ou perfil"}
         onChange={(e) => setSearch(e.target.value)}
       />
       <div className="flex flex-col">

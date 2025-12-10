@@ -44,7 +44,7 @@ export default function UpdateSectorForm({
       <input type="hidden" name="id_setor" value={sector.id_setor} />
 
       <Input
-        label="Título setor:"
+        label="Título do setor:"
         name="titulo_setor"
         placeholder="Digite o título do setor"
         defaultValue={sector.titulo_setor}
