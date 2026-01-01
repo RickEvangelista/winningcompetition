@@ -33,7 +33,6 @@ export async function middleware(req: Request) {
   const session = await auth();
   const { pathname } = new URL(req.url);
 
-  // 🔒 Usuário logado não pode acessar "/"
   if (session && pathname === "/") {
     const role = session.user?.profile as Role | undefined;
 
@@ -44,12 +43,10 @@ export async function middleware(req: Request) {
     }
   }
 
-  // 🔓 Usuário não logado tentando acessar dashboard
   if (!session && pathname.startsWith("/dashboard")) {
     return NextResponse.redirect(new URL("/", req.url));
   }
 
-  // 🔐 Controle de acesso por role
   if (session) {
     const role = session.user?.profile as Role | undefined;
 
