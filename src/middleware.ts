@@ -3,37 +3,74 @@ import { auth } from "@/lib/auth";
 
 type Role = "Administrador" | "Vendedor" | "Validador";
 
-const rolePermissions: Record<Role, string[]> = {
-  Administrador: ["/dashboard"],
-  Vendedor: ["/dashboard/perfil", "/dashboard/ingressos/criar"],
-  Validador: ["/dashboard/perfil", "/dashboard/validacao"],
+type RoleConfig = {
+  home: string;
+  allowedRoutes: string[];
+};
+
+const ROLE_CONFIG: Record<Role, RoleConfig> = {
+  Administrador: {
+    home: "/dashboard/eventos",
+    allowedRoutes: ["/dashboard"],
+  },
+  Vendedor: {
+    home: "/dashboard/ingressos/criar",
+    allowedRoutes: [
+      "/dashboard/perfil",
+      "/dashboard/ingressos",
+    ],
+  },
+  Validador: {
+    home: "/dashboard/validacao",
+    allowedRoutes: [
+      "/dashboard/perfil",
+      "/dashboard/validacao",
+    ],
+  },
 };
 
 export async function middleware(req: Request) {
   const session = await auth();
-  const url = new URL(req.url);
-  const pathname = url.pathname;
+  const { pathname } = new URL(req.url);
 
-  if (!session) {
+  // 🔒 Usuário logado não pode acessar "/"
+  if (session && pathname === "/") {
+    const role = session.user?.profile as Role | undefined;
+
+    if (role && ROLE_CONFIG[role]) {
+      return NextResponse.redirect(
+        new URL(ROLE_CONFIG[role].home, req.url)
+      );
+    }
+  }
+
+  // 🔓 Usuário não logado tentando acessar dashboard
+  if (!session && pathname.startsWith("/dashboard")) {
     return NextResponse.redirect(new URL("/", req.url));
   }
 
-  const role = session.user?.profile as Role | undefined;
+  // 🔐 Controle de acesso por role
+  if (session) {
+    const role = session.user?.profile as Role | undefined;
 
-  if (!role || !Object.keys(rolePermissions).includes(role)) {
-    return NextResponse.redirect(new URL("/", req.url));
+    if (!role || !ROLE_CONFIG[role]) {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+
+    const { allowedRoutes, home } = ROLE_CONFIG[role];
+
+    const hasAccess = allowedRoutes.some(route =>
+      pathname.startsWith(route)
+    );
+
+    if (!hasAccess) {
+      return NextResponse.redirect(new URL(home, req.url));
+    }
   }
-
-  if (role === "Administrador") return NextResponse.next();
-
-  const allowedRoutes = rolePermissions[role];
-  const hasAccess = allowedRoutes.some(route => pathname.startsWith(route));
-
-  if (!hasAccess) return NextResponse.redirect(new URL("/", req.url));
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*"],
+  matcher: ["/", "/dashboard/:path*"],
 };

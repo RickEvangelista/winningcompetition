@@ -28,14 +28,8 @@ export default function LoginForm() {
       return;
     }
 
-    let redirectUrl = "/"
-    const session = await getSession();
-    const profile = session?.user?.profile;
-    if(profile === "Administrador") redirectUrl = "/dashboard/eventos"
-    if(profile === "Vendedor") redirectUrl = "/dashboard/ingressos/criar"
-    if(profile === "Validador") redirectUrl = "/dashboard/validacao"
+    window.location.href = "/";
 
-    window.location.href = redirectUrl;
   };
 
   return (
